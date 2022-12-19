@@ -69,6 +69,18 @@ app.get('/verify-number', (req, res) => {
   })
 });
 
+app.post('/send-sms', async (req, res) => {
+  const to = req.body.number;
+  const text = req.body.text;
+  await vonage.sms.send({ to, from: VONAGE_BRAND_NAME, text })
+    .then(resp => {
+      console.log('Message sent successfully');
+      console.log(resp);
+    })
+    .catch(err => console.error(err));
+  res.status(201).send("success");
+});
+
 // Run the web server
 const server = app.listen(3000, () => {
     console.log(`Server running on port ${server.address().port}`);
