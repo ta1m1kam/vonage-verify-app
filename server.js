@@ -33,8 +33,15 @@ const vonage = new Vonage({
 }, { debug: true });
 
 // Define your routes here
-app.post('/verify', (req, res) => {
+app.post('/verify', async (req, res) => {
   verifyRequestNumber = req.body.number;
+
+  const resp = await vonage.numberInsights.basicLookup(req.body.number);
+  console.log(resp);
+  if (resp.status !== 0) {
+    return res.status(400).send("invalid number");
+  }
+
   vonage.verify.start({
     number: verifyRequestNumber,
     brand: VONAGE_BRAND_NAME
@@ -81,6 +88,11 @@ app.post('/send-sms', async (req, res) => {
   res.status(201).send("success");
 });
 
+app.post('/number-lookup', async (req, res) => {
+  const resp = await vonage.numberInsights.basicLookup(req.body.number);
+  console.log(resp);
+  res.status(201).send(resp);
+})
 // Run the web server
 const server = app.listen(3000, () => {
     console.log(`Server running on port ${server.address().port}`);

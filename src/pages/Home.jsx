@@ -1,4 +1,4 @@
-import { Button, Chip, FormControl, TextField } from "@mui/material";
+import { Button, Card, Chip, FormControl, TextField } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import MdPhone from '@mui/icons-material/Phone';
@@ -8,6 +8,7 @@ const Home = () => {
   const [verifyNumber, setVerifyNumber] = useState(null);
   const [fromVerifyCode, setFromVerifyCode] = useState(null);
   const [text, setText] = useState("");
+  const [lookupInfo, setLookupInfo] = useState(null);
   const search = useLocation().search;
   const query = new URLSearchParams(search);
   if (query.verify) {
@@ -46,6 +47,19 @@ const Home = () => {
     });
   }
 
+const handleSubmitLookup = async () => {
+  const data = { number: verifyNumber };
+  const response = await fetch("/number-lookup", {
+    method: "POST",
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  });
+  const json = await response.json();
+  setLookupInfo(JSON.stringify(json));
+}
+
   return (
     <>
       <h1>Account Management!</h1>
@@ -75,6 +89,22 @@ const Home = () => {
               Send SMS
             </Button>
           </FormControl>
+
+<FormControl fullWidth sx={{ m: 1 }}>
+  <Button 
+    variant="contained"
+    onClick={handleSubmitLookup}
+  >
+    Lookup Number
+  </Button>
+  {
+    lookupInfo && (
+      <Card>
+        {lookupInfo}
+      </Card>
+    )
+  }
+</FormControl>
         </Box>)
       }
     </>
